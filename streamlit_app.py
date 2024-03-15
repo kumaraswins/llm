@@ -1,9 +1,7 @@
+#from dotenv import load_dotenv
 import os
 import streamlit as st
-import requests
 from typing import List
-import json
-import socket
 from urllib3.connection import HTTPConnection
 import ingest
 import chromadb
@@ -22,7 +20,7 @@ embeddings_model_name = os.environ.get("EMBEDDINGS_MODEL_NAME","all-MiniLM-L6-v2
 target_source_chunks = int(os.environ.get('TARGET_SOURCE_CHUNKS',4))
 model_type = os.environ.get('MODEL_TYPE',"mistral")
 
-llm = Ollama(model=model_type, callbacks=[])
+llm = Ollama(model=model_type, callbacks=[StreamingStdOutCallbackHandler()])
 embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
 
 

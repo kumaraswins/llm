@@ -1,7 +1,6 @@
 import os
 import glob
 from typing import List
-from dotenv import load_dotenv
 import argparse
 
 from langchain.document_loaders import (
