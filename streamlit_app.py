@@ -15,15 +15,14 @@ from langchain.chains import RetrievalQA
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 from constants import CHROMA_SETTINGS
-load_dotenv()
+#load_dotenv()
 
-API_BASE_URL = os.environ.get("API_BASE_URL")
-embeddings_model_name = os.environ.get("EMBEDDINGS_MODEL_NAME")
-persist_directory = os.environ.get('PERSIST_DIRECTORY')
+persist_directory = os.environ.get('PERSIST_DIRECTORY', "db")
 source_directory = os.environ.get('SOURCE_DIRECTORY', 'source_documents')
-embeddings_model_name = os.environ.get("EMBEDDINGS_MODEL_NAME")
+embeddings_model_name = os.environ.get("EMBEDDINGS_MODEL_NAME","all-MiniLM-L6-v2")
 target_source_chunks = int(os.environ.get('TARGET_SOURCE_CHUNKS',4))
-model_type = os.environ.get('MODEL_TYPE')
+model_type = os.environ.get('MODEL_TYPE',"mistral")
+
 llm = Ollama(model=model_type, callbacks=[])
 embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
 
@@ -37,9 +36,9 @@ def main():
     # Document upload section
     st.header("Document Upload")
     files = st.file_uploader("Upload document", accept_multiple_files=True)
-    # collection_name = st.text_input("Collection Name") not working for some reason
-    if st.button("Embed"):
-        embed_documents(files, "collection_name")
+    collection_name = st.text_input("Collection Name") 
+    if collection_name and st.button("Embed"):
+        embed_documents(files, collection_name)
     
     # Query section
     st.header("Document Retrieval")
@@ -51,26 +50,18 @@ def main():
             retrieve_documents(query, selected_collection)
 
 def embed_documents(files:List[st.runtime.uploaded_file_manager.UploadedFile], collection_name:str):
-    # endpoint = f"{API_BASE_URL}/embed"
-    # files_data = [("files", file) for file in files]
-    # data = {"collection_name": collection_name}
-
-    # response = requests.post(endpoint, files=files_data, data=data)
-    # if response.status_code == 200:
-    #     st.success("Documents embedded successfully!")
-    # else:
-    #     st.error("Document embedding failed.")
-    #     st.write(response.text)
+    
     saved_files = []
-    for file in files:
-        file_path = os.path.join(source_directory, file.filename)
+    # print(files_data)
+    for uploaded_file in files:
+        file_path = os.path.join(source_directory, uploaded_file.name)
         saved_files.append(file_path)
-        
         with open(file_path, "wb") as f:
-            f.write(file.read())
+            f.write(uploaded_file.read())
 
     out = ingest.main(collection_name)
     st.write(out)
+    [os.remove(os.path.join(source_directory, file.name)) or os.path.join(source_directory, file.name) for file in files]
 
 
 def get_collection_names():

@@ -24,12 +24,13 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.docstore.document import Document
 from constants import CHROMA_SETTINGS
 
-load_dotenv()
-persist_directory = os.environ.get('PERSIST_DIRECTORY')
+#load_dotenv()
+persist_directory = os.environ.get('PERSIST_DIRECTORY',"db")
 source_directory = os.environ.get('SOURCE_DIRECTORY', 'source_documents')
-embeddings_model_name = os.environ.get('EMBEDDINGS_MODEL_NAME')
+embeddings_model_name = os.environ.get('EMBEDDINGS_MODEL_NAME',"all-MiniLM-L6-v2")
 chunk_size = 500
 chunk_overlap = 50
+
 # Map file extensions to document loaders and their arguments
 LOADER_MAPPING = {
     ".csv": (CSVLoader, {}),
