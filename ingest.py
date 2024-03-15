@@ -47,7 +47,7 @@ LOADER_MAPPING = {
     # Add more mappings for other file extensions and loaders as needed
 }
 
-load_dotenv()
+#load_dotenv()
 
 
 def does_vectorstore_exist(persist_directory: str) -> bool:
